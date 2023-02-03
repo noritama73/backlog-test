@@ -8,7 +8,7 @@ on:
 
 env:
   BACKLOG_KEY: ${{ secrets.BACKLOG_KEY }}
-  BACKLOG_BASE_URL: "https://noritama73.backlog.com"
+  BACKLOG_BASE_URL: https://noritama73.backlog.com
 
 jobs:
   get-ticket-name:
