@@ -26,11 +26,10 @@ jobs:
         id: get-status-list
         run: |
           LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-ticket-name.outputs.project_id }}/statuses?apiKey=${{ env.BACKLOG_KEY }}`
-          echo ${LIST_JSON}
           PENDING_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "処理中") | .id'`
-          echo "pending_status_id=`echo ${PENDING_STATUS_ID}" >> $GITHUB_OUTPUT
+          echo "pending_status_id=`echo ${PENDING_STATUS_ID}`" >> $GITHUB_OUTPUT
           FINISHED_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "完了") | .id'`
-          echo "finished_status_id=`echo ${FINISHED_STATUS_ID}" >> $GITHUB_OUTPUT
+          echo "finished_status_id=`echo ${FINISHED_STATUS_ID}`" >> $GITHUB_OUTPUT
 
       - name: Set pending status
         if: github.event.pull_request.merged == false
