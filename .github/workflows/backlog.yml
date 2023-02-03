@@ -11,22 +11,19 @@ env:
   BACKLOG_BASE_URL: https://noritama73.backlog.com
 
 jobs:
-  get-ticket-name:
+  sync-backlog:
     runs-on: ubuntu-latest
     steps:
       - name: Get Project Name
+        id: get-ticket-name
         run: |
           PROJECT_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*\)-[0-9]*>.*/\1/'`
           ISSUE_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*-[0-9]*\)>.*/\1/'`
           echo "project_id=`echo ${PROJECT_ID}`" >> $GITHUB_OUTPUT
           echo "issue_id=`echo ${ISSUE_ID}`" >> $GITHUB_OUTPUT
 
-  get-status-list:
-    runs-on: ubuntu-latest
-    needs:
-      - get-ticket-name
-    steps:
       - name: Get Status List
+        id: get-status-list
         run: |
           LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-ticket-name.outputs.project_id }}/statuses?apiKey=${{ env.BACKLOG_KEY }}`
           echo ${LIST_JSON}
@@ -35,22 +32,12 @@ jobs:
           FINISHED_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "完了") | .id'`
           echo "finished_status_id=`echo ${FINISHED_STATUS_ID}" >> $GITHUB_OUTPUT
 
-  pending-backlog:
-    if: github.event.pull_request.merged == false
-    runs-on: ubuntu-latest
-    needs:
-      - get-status-list
-    steps:
       - name: Set pending status
+        if: github.event.pull_request.merged == false
         run: |
           curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.pending_status_id }} ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ env.BACKLOG_KEY }}'
 
-  finish-backlog:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    needs:
-      - get-status-list
-    steps:
       - name: Set finished status
+        if: github.event.pull_request.merged == true
         run: |
           echo "merged"
