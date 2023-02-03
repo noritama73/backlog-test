@@ -34,7 +34,7 @@ jobs:
       - name: Set pending status
         if: github.event.pull_request.merged == false
         run: |
-          curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.pending_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ env.BACKLOG_KEY }}'
+          curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.pending_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ env.BACKLOG_KEY }}
 
       - name: Set finished status
         if: github.event.pull_request.merged == true
