@@ -1,9 +1,8 @@
-name: Synchronize backlog status with PR
+name: Make backlog status finished
 
 on:
   pull_request:
     types:
-      - opened 
       - closed
 
 env:
@@ -25,17 +24,15 @@ jobs:
         id: get-status-list
         run: |
           LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-ticket-name.outputs.project_id }}/statuses?apiKey=${{ secrets.BACKLOG_KEY }}`
-          PENDING_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "処理中") | .id'`
-          echo "pending_status_id=`echo ${PENDING_STATUS_ID}`" >> $GITHUB_OUTPUT
           FINISHED_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "完了") | .id'`
           echo "finished_status_id=`echo ${FINISHED_STATUS_ID}`" >> $GITHUB_OUTPUT
 
-      - name: Set pending status
-        if: github.event.pull_request.merged == false
-        run: |
-          curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.pending_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
-
-      - name: Set finished status
+      - name: Set status
         if: github.event.pull_request.merged == true
+        env: 
+          BASE_REF: ${{ github.event.pull_request.base_ref }}
         run: |
-          curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.finished_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
+          echo "$BASE_REF"
+          if [ "$BASE_REF" == "develop" ]; then
+            curl -X PATCH --data -urlencode 'statusId=${{ steps.get-status-list.outputs.finished_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
+          fi
