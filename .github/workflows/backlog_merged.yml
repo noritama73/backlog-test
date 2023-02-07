@@ -33,6 +33,6 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base_ref }}
         run: |
           echo "$BASE_REF"
-          if [ "$BASE_REF" == "develop" ]; then
+          if [ "$BASE_REF" = "develop" ]; then
             curl -X PATCH --data -urlencode 'statusId=${{ steps.get-status-list.outputs.finished_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
           fi
