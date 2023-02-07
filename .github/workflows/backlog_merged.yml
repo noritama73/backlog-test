@@ -9,7 +9,7 @@ env:
   BACKLOG_BASE_URL: https://noritama73.backlog.com
 
 jobs:
-  sync-backlog:
+  finish-status:
     runs-on: ubuntu-latest
     steps:
       - name: Get Project Name
