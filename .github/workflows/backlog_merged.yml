@@ -11,6 +11,7 @@ env:
 jobs:
   finish-status:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - name: Get Project Name
         id: get-ticket-name
@@ -28,7 +29,6 @@ jobs:
           echo "finished_status_id=`echo ${FINISHED_STATUS_ID}`" >> $GITHUB_OUTPUT
 
       - name: Set status
-        if: github.event.pull_request.merged == true
         env: 
           BASE_REF: ${{ github.base_ref }}
         run: |
