@@ -1,0 +1,36 @@
+name: Make backlog status pending
+
+on:
+  pull_request:
+    types:
+      - opened 
+
+env:
+  BACKLOG_BASE_URL: https://noritama73.backlog.com
+
+jobs:
+  comment-pr-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Project Name
+        id: get-ticket-name
+        run: |
+          PROJECT_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*\)-[0-9]*>.*/\1/'`
+          ISSUE_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*-[0-9]*\)>.*/\1/'`
+          echo "project_id=`echo ${PROJECT_ID}`" >> $GITHUB_OUTPUT
+          echo "issue_id=`echo ${ISSUE_ID}`" >> $GITHUB_OUTPUT
+
+      - name: Comment PR link
+        run: |
+          curl -X POST --data-urlencode 'content="${{ github.event.pull_request.html_url }}"' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}/comments?apiKey=${{ secrets.BACKLOG_KEY }
+
+      # - name: Get Status List
+      #   id: get-status-list
+      #   run: |
+      #     LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-ticket-name.outputs.project_id }}/statuses?apiKey=${{ secrets.BACKLOG_KEY }}`
+      #     PENDING_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "処理中") | .id'`
+      #     echo "pending_status_id=`echo ${PENDING_STATUS_ID}`" >> $GITHUB_OUTPUT
+
+      # - name: Set pending status
+      #   run: |
+      #     curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.pending_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
