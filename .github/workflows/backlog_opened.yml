@@ -22,7 +22,7 @@ jobs:
 
       - name: Comment PR link
         run: |
-          curl -X POST --data-urlencode 'content=${{ github.event.pull_request.html_url }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}/comments?apiKey=${{ secrets.BACKLOG_KEY }
+          curl -X POST --data-urlencode 'content="${{ github.event.pull_request.html_url }}"' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}/comments?apiKey=${{ secrets.BACKLOG_KEY }
 
       # - name: Get Status List
       #   id: get-status-list
