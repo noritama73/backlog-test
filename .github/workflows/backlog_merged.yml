@@ -15,9 +15,11 @@ jobs:
     steps:
       - name: Get Project Name
         id: get-ticket-name
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          PROJECT_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*\)-[0-9]*>.*/\1/'`
-          ISSUE_ID=`echo "${{ github.event.pull_request.title }}" | sed -e 's/.*<\(.*-[0-9]*\)>.*/\1/'`
+          PROJECT_ID=`echo "$PR_TITLE" | sed -e 's/.*<\(.*\)-[0-9]*>.*/\1/'`
+          ISSUE_ID=`echo "$PR_TITLE" | sed -e 's/.*<\(.*-[0-9]*\)>.*/\1/'`
           echo "project_id=`echo ${PROJECT_ID}`" >> $GITHUB_OUTPUT
           echo "issue_id=`echo ${ISSUE_ID}`" >> $GITHUB_OUTPUT
 
