@@ -30,7 +30,7 @@ jobs:
       - name: Set status
         if: github.event.pull_request.merged == true
         env: 
-          BASE_REF: ${{ github.event.pull_request.base_ref }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
           echo "$BASE_REF"
           if [ "$BASE_REF" = "develop" ]; then
