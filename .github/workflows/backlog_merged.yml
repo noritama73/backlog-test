@@ -14,7 +14,7 @@ jobs:
     if: github.event.pull_request.merged == true
     steps:
       - name: Get Project Name
-        id: get-ticket-name
+        id: get-project-name
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
@@ -26,7 +26,7 @@ jobs:
       - name: Get Status List
         id: get-status-list
         run: |
-          LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-ticket-name.outputs.project_id }}/statuses?apiKey=${{ secrets.BACKLOG_KEY }}`
+          LIST_JSON=`curl ${{ env.BACKLOG_BASE_URL }}/api/v2/projects/${{ steps.get-project-name.outputs.project_id }}/statuses?apiKey=${{ secrets.BACKLOG_KEY }}`
           FINISHED_STATUS_ID=`echo ${LIST_JSON} | jq '.[] | select(.name == "完了") | .id'`
           echo "finished_status_id=`echo ${FINISHED_STATUS_ID}`" >> $GITHUB_OUTPUT
 
@@ -36,5 +36,5 @@ jobs:
         run: |
           echo "$BASE_REF"
           if [ "$BASE_REF" = "develop" ]; then
-            curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.finished_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-ticket-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
+            curl -X PATCH --data-urlencode 'statusId=${{ steps.get-status-list.outputs.finished_status_id }}' ${{ env.BACKLOG_BASE_URL }}/api/v2/issues/${{ steps.get-project-name.outputs.issue_id }}?apiKey=${{ secrets.BACKLOG_KEY }}
           fi
